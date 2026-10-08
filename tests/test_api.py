@@ -86,3 +86,72 @@ def test_rate_limit():
         main.API_KEY = original_api_key
         main.rate_limiter.limit = original_limit
 
+def test_generation_failure_returns_503(monkeypatch):
+    from rag_agent.api import main
+
+    def failing_generate(prompt):
+        raise RuntimeError("Ollama unavailable")
+
+    monkeypatch.setattr(main, "generate", failing_generate)
+
+    response = client.post(
+        "/ask",
+        headers={"api-key": "dev-test-key"},
+        json={
+            "query": "What does Nexus-RAG store?",
+            "top_k": 1,
+        },
+    )
+
+    assert response.status_code == 503
+    assert response.json()["error"] == "Generation service unavailable"
+
+def test_query_cache_redis_failure_is_non_fatal():
+    from rag_agent.cache.query_cache import QueryCache
+    import redis
+
+    class FailingRedis:
+        def get(self, key):
+            raise redis.RedisError("Redis unavailable")
+
+        def setex(self, key, ttl, value):
+            raise redis.RedisError("Redis unavailable")
+
+    cache = QueryCache(FailingRedis())
+
+    assert cache.get("test query", 5) is None
+
+    cache.set(
+        "test query",
+        5,
+        '{"answer":"test"}',
+    )
+
+def test_retrieval_database_failure_returns_503():
+    from rag_agent.api import main
+    from sqlalchemy.exc import SQLAlchemyError
+
+    class FailingSession:
+        def execute(self, statement):
+            raise SQLAlchemyError("Postgres unavailable")
+
+    def fake_get_db():
+        yield FailingSession()
+
+    main.app.dependency_overrides[main.get_db] = fake_get_db
+
+    try:
+        response = client.post(
+            "/ask",
+            headers={"api-key": "dev-test-key"},
+            json={
+                "query": "Explain Nexus-RAG storage architecture test 938271",
+                "top_k": 1,
+            },
+        )
+
+        assert response.status_code == 503
+        assert response.json()["error"] == "Retrieval service unavailable"
+    finally:
+        main.app.dependency_overrides.clear()
+

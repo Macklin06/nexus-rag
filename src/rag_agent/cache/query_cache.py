@@ -44,7 +44,12 @@ class QueryCache:
         top_k: int,
     ) -> str | None:
         key = self.build_key(query, top_k)
-        return self.client.get(key)
+
+        try:
+            return self.client.get(key)
+        except redis.RedisError:
+            return None
+
 
     def set(
         self,
@@ -53,8 +58,12 @@ class QueryCache:
         value: str,
     ) -> None:
         key = self.build_key(query, top_k)
-        self.client.setex(
-            key,
-            self.ttl,
-            value,
-        )
+
+        try:
+            self.client.setex(
+                key,
+                self.ttl,
+                value,
+            )
+        except redis.RedisError:
+            return

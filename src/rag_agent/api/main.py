@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from fastapi.requests import Request
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from rag_agent.db.database import get_db
 from rag_agent.db.models import Document, DocumentVersion
 from rag_agent.ingestion.jobs import IngestionJob
@@ -358,23 +359,31 @@ def ask_documents(request: AskRequest, db: Session = Depends(get_db)):
 
     if cached_response is not None:
         return AskResponse.model_validate_json(cached_response)
-    
+
     query_embedding = embed_text(request.query)
+    
+    try:
 
-    vector_statement = build_vector_search_query(
-        query_embedding=query_embedding,
-        top_k=request.top_k,
-    )
-    vector_rows = db.execute(vector_statement).all()
+        vector_statement = build_vector_search_query(
+            query_embedding=query_embedding,
+            top_k=request.top_k,
+        )
+        vector_rows = db.execute(vector_statement).all()
 
-    vector_chunks = {chunk.id: chunk for chunk, _ in vector_rows}
-    vector_ranked_ids = [chunk.id for chunk, _ in vector_rows]
+        vector_chunks = {chunk.id: chunk for chunk, _ in vector_rows}
+        vector_ranked_ids = [chunk.id for chunk, _ in vector_rows]
 
-    full_text_statement = build_full_text_search_query(
-        query=request.query,
-        top_k=request.top_k,
-    )
-    full_text_rows = db.execute(full_text_statement).all()
+        full_text_statement = build_full_text_search_query(
+            query=request.query,
+            top_k=request.top_k,
+        )
+        full_text_rows = db.execute(full_text_statement).all()
+
+    except SQLAlchemyError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Retrieval service unavailable",
+        ) from exc
 
     full_text_chunks = {chunk.id: chunk for chunk, _ in full_text_rows}
     full_text_ranked_ids = [chunk.id for chunk, _ in full_text_rows]
@@ -405,7 +414,13 @@ def ask_documents(request: AskRequest, db: Session = Depends(get_db)):
         contexts=contexts,
     )
 
-    answer = generate(prompt)
+    try:
+        answer = generate(prompt)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Generation service unavailable",
+        ) from exc
 
     sources = [
         SourceReference(
