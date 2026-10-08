@@ -55,3 +55,34 @@ def test_missing_document():
 
     assert response.status_code == 404
 
+def test_rate_limit():
+    from rag_agent.api import main
+
+    original_limit = main.rate_limiter.limit
+    original_api_key = main.API_KEY
+
+    test_api_key = "rate-limit-test-key"
+    main.API_KEY = test_api_key
+    main.rate_limiter.limit = 2
+
+    try:
+        first = client.get(
+            "/documents/999999",
+            headers={"api-key": test_api_key},
+        )
+        second = client.get(
+            "/documents/999999",
+            headers={"api-key": test_api_key},
+        )
+        third = client.get(
+            "/documents/999999",
+            headers={"api-key": test_api_key},
+        )
+
+        assert first.status_code == 404
+        assert second.status_code == 404
+        assert third.status_code == 429
+    finally:
+        main.API_KEY = original_api_key
+        main.rate_limiter.limit = original_limit
+

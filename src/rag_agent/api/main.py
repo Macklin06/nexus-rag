@@ -32,6 +32,7 @@ from rag_agent.retrieval.vector import (
 from rag_agent.generation.llm import generate
 from rag_agent.generation.prompts import build_grounded_prompt
 from rag_agent.cache.query_cache import QueryCache
+from rag_agent.api.rate_limit import RateLimiter
 
 
 load_dotenv()
@@ -48,6 +49,12 @@ redis_client = redis.Redis.from_url(
 query_cache = QueryCache(
     redis_client,
     ttl=int(os.getenv("QUERY_CACHE_TTL", "300")),
+)
+
+rate_limiter = RateLimiter(
+    redis_client,
+    limit=int(os.getenv("RATE_LIMIT", "60")),
+    window=int(os.getenv("RATE_LIMIT_WINDOW", "60")),
 )
 
 ingestion_queue = IngestionQueue(redis_client)
@@ -72,8 +79,15 @@ def verify_api_key(api_key: str = Header(...)):
     if api_key != API_KEY:
         raise HTTPException(
             status_code=401,
-            detail="Invalid API key"
+            detail="Invalid API key",
         )
+
+    if not rate_limiter.allow(api_key):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+        )
+
     return api_key
 
 
