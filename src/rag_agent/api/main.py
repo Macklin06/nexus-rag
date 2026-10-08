@@ -336,7 +336,7 @@ def query_documents(request: QueryRequest, db: Session = Depends(get_db)):
             document_version_id=all_chunks[chunk_id].document_version_id,
             chunk_index=all_chunks[chunk_id].chunk_index,
             content=all_chunks[chunk_id].content,
-            similarity=rrf_score,
+            rrf_score=rrf_score,
         )
         for chunk_id, rrf_score in fused_results[:request.top_k]
     ]
