@@ -7,6 +7,13 @@ Requires-Dist: python-dotenv<2,>=1.2
 Requires-Dist: pydantic<3,>=2.0
 Requires-Dist: fastapi
 Requires-Dist: uvicorn
+Requires-Dist: redis
+Requires-Dist: sqlalchemy<3,>=2.0
+Requires-Dist: psycopg[binary]<4,>=3.2
+Requires-Dist: python-multipart
+Requires-Dist: sentence-transformers<6,>=3
+Requires-Dist: pgvector<1,>=0.3
+Requires-Dist: requests<3,>=2.32
 Provides-Extra: dev
 Requires-Dist: pytest<9,>=8; extra == "dev"
 Requires-Dist: httpx<1,>=0.27; extra == "dev"

@@ -21,7 +21,7 @@ def test_create_and_get_document():
             "source": "DGMS",
         },)
 
-    assert response.status_code == 200
+    assert response.status_code == 202
 
     data = response.json()
     document_id = data["id"]

@@ -8,11 +8,18 @@ version = "0.1.0"
 description = "AI retrieves data and answers questions based on DGMS guidelines"
 requires-python = ">=3.13"
 dependencies = [
-		"python-dotenv >= 1.2,<2",
-		"pydantic>=2.0,<3",
-		"fastapi",
-		"uvicorn"
-		]
+    "python-dotenv >=1.2,<2",
+    "pydantic>=2.0,<3",
+    "fastapi",
+    "uvicorn",
+    "redis",
+    "sqlalchemy>=2.0,<3",
+    "psycopg[binary]>=3.2,<4",
+    "python-multipart",
+    "sentence-transformers>=3,<6",
+    "pgvector>=0.3,<1",
+    "requests>=2.32,<3",
+]
 
 [project.optional-dependencies]
 dev = [
