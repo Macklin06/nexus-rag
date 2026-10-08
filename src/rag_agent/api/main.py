@@ -31,6 +31,7 @@ from rag_agent.retrieval.vector import (
 )
 from rag_agent.generation.llm import generate
 from rag_agent.generation.prompts import build_grounded_prompt
+from rag_agent.cache.query_cache import QueryCache
 
 
 load_dotenv()
@@ -40,6 +41,13 @@ API_KEY = os.getenv("API_KEY")
 redis_client = redis.Redis.from_url(
     os.environ["REDIS_URL"],
     decode_responses=True,
+    socket_connect_timeout=5,
+    socket_timeout=None,
+)
+
+query_cache = QueryCache(
+    redis_client,
+    ttl=int(os.getenv("QUERY_CACHE_TTL", "300")),
 )
 
 ingestion_queue = IngestionQueue(redis_client)
@@ -329,6 +337,14 @@ def query_documents(request: QueryRequest, db: Session = Depends(get_db)):
     dependencies=[Depends(verify_api_key)],
 )
 def ask_documents(request: AskRequest, db: Session = Depends(get_db)):
+    cached_response = query_cache.get(
+        request.query,
+        request.top_k,
+    )
+
+    if cached_response is not None:
+        return AskResponse.model_validate_json(cached_response)
+    
     query_embedding = embed_text(request.query)
 
     vector_statement = build_vector_search_query(
@@ -386,8 +402,16 @@ def ask_documents(request: AskRequest, db: Session = Depends(get_db)):
         for chunk in selected_chunks
     ]
 
-    return AskResponse(
+    response = AskResponse(
         query=request.query,
         answer=answer,
         sources=sources,
     )
+
+    query_cache.set(
+        request.query,
+        request.top_k,
+        response.model_dump_json(),
+    )
+
+    return response
