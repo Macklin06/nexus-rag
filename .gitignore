@@ -1,2 +1,26 @@
+# Secrets and environment configuration
 .env
+.env.*
+!.env.example
+
+# Python environments
 venv/
+.venv/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Test and tooling artifacts
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Local evaluation intermediates
+evaluation/chunks_dump.txt
+evaluation/eval_candidates.txt

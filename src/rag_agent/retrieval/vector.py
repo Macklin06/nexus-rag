@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+import re
 
 from sqlalchemy import Select, func, select
 
@@ -14,8 +15,10 @@ def build_full_text_search_query(
     if top_k <= 0:
         raise ValueError("top_k must be greater than 0")
 
-    search_vector = func.to_tsvector("simple", DocumentChunk.content)
-    search_query = func.plainto_tsquery("simple", query)
+    search_terms = re.findall(r"[^\W_]+", query, flags=re.UNICODE)
+    search_query_text = " OR ".join(search_terms)
+    search_vector = func.to_tsvector("english", DocumentChunk.content)
+    search_query = func.websearch_to_tsquery("english", search_query_text)
     rank = func.ts_rank_cd(search_vector, search_query).label("rank")
 
     return (

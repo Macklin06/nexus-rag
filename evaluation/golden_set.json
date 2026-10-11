@@ -1,0 +1,134 @@
+{
+  "version": "1.0",
+  "corpus": [
+    "attention.md",
+    "rag.md",
+    "lora.md",
+    "react.md"
+  ],
+  "cases": [
+    {
+      "id": "ATTN-01",
+      "question": "Why does the Transformer use multi-head attention instead of a single attention function?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "attention.md", "chunk_index": 17},
+        {"document": "attention.md", "chunk_index": 18}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "ATTN-02",
+      "question": "Why does scaled dot-product attention divide the query-key dot products by sqrt(d_k)?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "attention.md", "chunk_index": 16}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "ATTN-03",
+      "question": "Why does the Transformer require positional encodings?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "attention.md", "chunk_index": 23},
+        {"document": "attention.md", "chunk_index": 24}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "ATTN-04",
+      "question": "What are the main components of the Transformer encoder-decoder architecture described in the paper?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "attention.md", "chunk_index": 11},
+        {"document": "attention.md", "chunk_index": 12}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "RAG-01",
+      "question": "What are the parametric and non-parametric components in the RAG architecture?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "rag.md", "chunk_index": 2},
+        {"document": "rag.md", "chunk_index": 10}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "RAG-02",
+      "question": "What is the difference between RAG-Sequence and RAG-Token?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "rag.md", "chunk_index": 14},
+        {"document": "rag.md", "chunk_index": 15},
+        {"document": "rag.md", "chunk_index": 16}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "RAG-03",
+      "question": "What retrieval mechanism does the RAG paper use to obtain its top-K documents?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "rag.md", "chunk_index": 9},
+        {"document": "rag.md", "chunk_index": 17}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "RAG-04",
+      "question": "Why is the non-parametric memory useful for updating the knowledge available to a RAG system?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "rag.md", "chunk_index": 10},
+        {"document": "rag.md", "chunk_index": 12}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "LORA-01",
+      "question": "What does LoRA freeze and what does it train?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "lora.md", "chunk_index": 1},
+        {"document": "lora.md", "chunk_index": 2},
+        {"document": "lora.md", "chunk_index": 9}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "LORA-02",
+      "question": "How does LoRA represent the adapted weight matrix?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "lora.md", "chunk_index": 22}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "LORA-03",
+      "question": "Which Transformer weight matrices does the LoRA study primarily adapt?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "lora.md", "chunk_index": 35}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "REACT-01",
+      "question": "What are the three types of actions in the Wikipedia action space used by ReAct?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "react.md", "chunk_index": 28}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "REACT-02",
+      "question": "What is the structure of a ReAct trajectory, and what roles do thoughts and observations play?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "react.md", "chunk_index": 29}
+      ]},
+      "answerable": true
+    },
+    {
+      "id": "REACT-03",
+      "question": "What does the ReAct paper report about ReAct compared with Act on HotpotQA and Fever?",
+      "evidence": {"acceptable_chunks": [
+        {"document": "react.md", "chunk_index": 31},
+        {"document": "react.md", "chunk_index": 36}
+      ]},
+      "answerable": true
+    }
+  ]
+}
