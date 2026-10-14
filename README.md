@@ -19,13 +19,46 @@ Nexus-RAG is a retrieval-augmented generation (RAG) application with hybrid retr
 - Hybrid vector and full-text retrieval
 - Golden-set retrieval evaluation
 
+## Project Structure
+
+```text
+nexus-rag/
+├── src/
+│   └── rag_agent/
+│       └── api/                 # FastAPI application
+├── evaluation/
+│   ├── evaluate_retrieval.py    # Retrieval benchmark evaluator
+│   └── README.md                # Evaluation methodology and results
+├── migrations/                  # Alembic database migrations
+├── tests/                       # Automated test suite
+├── worker.py                    # Asynchronous ingestion worker
+├── async_experiment.py          # Async experiment script
+├── Dockerfile                   # Application container
+├── docker-compose.yml           # Local multi-service deployment
+├── alembic.ini                  # Migration configuration
+├── pyproject.toml               # Dependencies and project metadata
+├── .env.example                 # Environment configuration template
+├── .dockerignore
+├── .gitignore
+└── README.md
+```
+
+### Main Components
+
+- `src/rag_agent/`: Core application and RAG API code.
+- `worker.py`: Processes queued document-ingestion jobs.
+- `migrations/`: Database schema migrations managed by Alembic.
+- `evaluation/`: Golden-set retrieval evaluation and documented metrics.
+- `tests/`: Automated tests for application behavior.
+- `docker-compose.yml`: Defines the local application services.
+- `pyproject.toml`: Project metadata and Python dependencies.
 ## Requirements
 - Docker and Docker Compose
 - Python 3.13 or later for local development
 - Ollama running on the host with the configured model available
 
 ## Run
-Create a local .env file with the required configuration. Never commit secrets.
+Copy `.env.example` to `.env` and replace the API key placeholder. Never commit `.env` or real credentials.
 
 Review docker-compose.yml and ensure the database credentials and Ollama endpoint match your environment.
 
